@@ -1,0 +1,7 @@
+requests
+json
+numpy
+cv2
+mediapipe
+matplotlib
+
