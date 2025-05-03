@@ -1,4 +1,6 @@
 .git
 *.code-workspace
 src/__pycache__/
+src/.env
+*.py~
 

@@ -5,6 +5,7 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
 import sys, os, cv2, time
+from dotenv import load_dotenv
 import matplotlib.pyplot as plt
 import ecal.core.core as ecal_core
 from ecal.core.publisher import ProtoPublisher
@@ -12,6 +13,10 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import facemesh_pb2
+
+# load configuration from .env file
+load_dotenv() 
+usecam = str(os.getenv('USECAM'))
 
 enum_LM = ["nose", "chin", "left eye", "upper lid left", "lower lid left", "right eye", "upper lid right", "lower lid right", "left mouth", "right mouth", "upper lip", "lower lip"]
 
@@ -171,7 +176,8 @@ if __name__ == "__main__":
     print('#')
     
     #Load the input image.
-    image = mp.Image.create_from_file("image.png")
+    if usecam == "False":
+    	image = mp.Image.create_from_file("image.png")
     
     annotated_image, facemarkers = CalcMesh(image)
     

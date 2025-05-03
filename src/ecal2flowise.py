@@ -4,13 +4,18 @@ from threading import Timer
 import ecal.core.core as ecal_core
 from ecal.core.subscriber import ProtoSubscriber
 from queue import Queue
+from dotenv import load_dotenv
 
 frame_queue = Queue(maxsize=1000)
 return_queue = Queue(maxsize=1000)
 
 import facemesh_pb2
 
-FLOW_ID = "0266d964-6966-4b91-a0f8-1641d4e46931"  # Substitute with your Flow-ID
+# load configuration from .env file
+load_dotenv() 
+flowid = str(os.getenv('FLOWID'))
+
+FLOW_ID = flowid  # Flowise Project ID
 FLOWISE_API_URL = f"http://localhost:8000/api/v1/prediction/{FLOW_ID}"
 
 def convert_protobuf_to_dict(pb_msg):
