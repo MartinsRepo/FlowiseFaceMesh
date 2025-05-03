@@ -53,7 +53,7 @@ def ecalrunner():
         frame_dict = frame_queue.get()
         payload = {"question": frame_dict}
         print("Payload being sent to Flowise:")
-        print(json.dumps(payload, indent=2))
+        #print(json.dumps(payload, indent=2))
 
         response = requests.post(
             FLOWISE_API_URL,

@@ -168,33 +168,71 @@ def PubFaceMesh(facemarkers):
     return data2ecal
 
 if __name__ == "__main__":
-    print('##################################################')
-    print('#')
-    print('# Bringing Webcam Frames to ECAL Protobuf Messages')
-    print('#')    
-    print('##################################################')
-    print('#')
+	print('##################################################')
+	print('#')
+	print('# Bringing Webcam Frames to ECAL Protobuf Messages')
+	print('#')    
+	print('##################################################')
+	print('#')
+	
+	# initialize ECAL message
+	pub = EcalSetup()
     
-    #Load the input image.
-    if usecam == "False":
-    	image = mp.Image.create_from_file("image.png")
-    
-    annotated_image, facemarkers = CalcMesh(image)
-    
-    # initialize ECAL message
-    pub = EcalSetup()
-    
-    data2ecal =  PubFaceMesh(facemarkers)
-    
-    window_name = 'image'
-    while ecal_core.ok():
-        pub.send(data2ecal)
-        time.sleep(0.5)
-        cv2.imshow(window_name, cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
-        cv2.waitKey(500)
+	if usecam == "True":
+    	
+		cap = cv2.VideoCapture(0)
         
-    # finalize eCAL API
-    ecal_core.finalize()
+		if not cap.isOpened():
+			print("❌ Could not open webcam.")
+			sys.exit(1)
+        
+		while ecal_core.ok():
+			ret, frame = cap.read()
+			if not ret:
+				print("❌ Failed to grab frame.")
+				break
+
+			# Convert OpenCV BGR to RGB
+			frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+			# Convert to MediaPipe Image
+			mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
+
+			# Run detection
+			annotated_image, facemarkers = CalcMesh(mp_image)
+
+			if facemarkers is not None:
+				data2ecal = PubFaceMesh(facemarkers)
+				pub.send(data2ecal)
+
+			# Show annotated frame
+			cv2.imshow("Facemesh", cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+			
+			if cv2.waitKey(1) & 0xFF == 27:  # ESC key to break
+				break
+
+		cap.release()
+		cv2.destroyAllWindows()
+    
+	else:
+    
+		#Load the input image.
+
+		image = mp.Image.create_from_file("image.png")
+
+		annotated_image, facemarkers = CalcMesh(image)
+
+		data2ecal =  PubFaceMesh(facemarkers)
+
+		window_name = 'image'
+		while ecal_core.ok():
+			pub.send(data2ecal)
+			time.sleep(0.5)
+			cv2.imshow(window_name, cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+			cv2.waitKey(500)
+        
+	# finalize eCAL API
+	ecal_core.finalize()
 
 
 
