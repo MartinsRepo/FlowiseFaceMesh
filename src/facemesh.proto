@@ -4,11 +4,7 @@ package pb.facedetection;
 
 message FD{
     string filename = 1;
-    uint64 timestamp = 2;
-    uint64 totalFrameCounter = 3;
-    repeated Landmarks packedlM = 4; //array of landmark data, packaged to reduce sampling rate
-    repeated FaceOval  packedFO = 5; //array of faceoval data
-    bool speechDetect = 6;
+    repeated Landmarks packedlM = 2; //array of landmark data, packaged to reduce sampling rate
 }
 
 message Landmarks{
@@ -17,8 +13,3 @@ message Landmarks{
     int32 y = 3;
 }
 
-message FaceOval{
-    string name = 1;
-    int32 x = 2;
-    int32 y = 3;
-}

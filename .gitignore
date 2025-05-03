@@ -1,0 +1,4 @@
+.git
+*.code-workspace
+src/__pycache__/
+

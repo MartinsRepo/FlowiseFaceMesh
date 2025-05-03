@@ -11,12 +11,9 @@ from ecal.core.publisher import ProtoPublisher
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
-protopath = os.getcwd()+'/proto/'
-print(protopath)
-sys.path.insert(0, protopath)
 import facemesh_pb2
 
-enum_LM = ["nose", "chin", "left eye", "right eye", "left mouth", "right mouth"]
+enum_LM = ["nose", "chin", "left eye", "upper lid left", "lower lid left", "right eye", "upper lid right", "lower lid right", "left mouth", "right mouth", "upper lip", "lower lip"]
 
 def draw_landmarks_on_image(rgb_image, detection_result):
   face_landmarks_list = detection_result.face_landmarks
@@ -86,22 +83,24 @@ def CalcMesh(image):
         if detection_result.face_landmarks:
             first_face_landmarks = detection_result.face_landmarks[0]
             
-            # configure list
-            #new_LMlist = data2ecal.packedlM
-            #enumLM_list = enumerate(enum_LM)
-            
             for landmark in first_face_landmarks:
                 x = int(landmark.x*iw)
                 y = int(landmark.y*iw)
-                faceXY.append((x, y))			# put all xy points in neat array
+                faceXY.append((x, y))	# put all xy points in neat array
                 
             image_points = np.array([
                 faceXY[19],     # "nose"
                 faceXY[152],    # "chin"
-                faceXY[226],    # "left eye left"
+                faceXY[226],    # "left eye"
+                faceXY[27],     # "upper lid left"
+                faceXY[23],     # "lower lid left"
                 faceXY[446],    # "right eye"
+                faceXY[257],    # "upper lid right"
+                faceXY[253],    # "lower lid right"
                 faceXY[57],     # "left mouth"
-                faceXY[287]     # "right mouth"
+                faceXY[287],    # "right mouth"
+                faceXY[0],      # "upper lip"
+                faceXY[7],      # "lower lip"
             ], dtype="double")
             
         return image_points

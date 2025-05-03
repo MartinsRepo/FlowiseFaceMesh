@@ -13,17 +13,15 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66\x61\x63\x65mesh.proto\x12\x10pb.facedetection\"\xb7\x01\n\x02\x46\x44\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x04\x12\x19\n\x11totalFrameCounter\x18\x03 \x01(\x04\x12-\n\x08packedlM\x18\x04 \x03(\x0b\x32\x1b.pb.facedetection.Landmarks\x12,\n\x08packedFO\x18\x05 \x03(\x0b\x32\x1a.pb.facedetection.FaceOval\x12\x14\n\x0cspeechDetect\x18\x06 \x01(\x08\"/\n\tLandmarks\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\".\n\x08\x46\x61\x63\x65Oval\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66\x61\x63\x65mesh.proto\x12\x10pb.facedetection\"E\n\x02\x46\x44\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12-\n\x08packedlM\x18\x02 \x03(\x0b\x32\x1b.pb.facedetection.Landmarks\"/\n\tLandmarks\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'facemesh_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _FD._serialized_start=37
-  _FD._serialized_end=220
-  _LANDMARKS._serialized_start=222
-  _LANDMARKS._serialized_end=269
-  _FACEOVAL._serialized_start=271
-  _FACEOVAL._serialized_end=317
+  _FD._serialized_start=36
+  _FD._serialized_end=105
+  _LANDMARKS._serialized_start=107
+  _LANDMARKS._serialized_end=154
 # @@protoc_insertion_point(module_scope)
