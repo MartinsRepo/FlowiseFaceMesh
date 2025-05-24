@@ -13,15 +13,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66\x61\x63\x65mesh.proto\x12\x10pb.facedetection\"E\n\x02\x46\x44\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12-\n\x08packedlM\x18\x02 \x03(\x0b\x32\x1b.pb.facedetection.Landmarks\"/\n\tLandmarks\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66\x61\x63\x65mesh.proto\x12\x10pb.facedetection\"\x9c\x01\n\x02\x46\x44\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x12\n\nframewidth\x18\x02 \x01(\x05\x12\x13\n\x0b\x66rameheight\x18\x03 \x01(\x05\x12-\n\x08packedlM\x18\x04 \x03(\x0b\x32\x1b.pb.facedetection.Landmarks\x12,\n\x08packedFO\x18\x05 \x03(\x0b\x32\x1a.pb.facedetection.FaceOval\"/\n\tLandmarks\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\".\n\x08\x46\x61\x63\x65Oval\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'facemesh_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _FD._serialized_start=36
-  _FD._serialized_end=105
-  _LANDMARKS._serialized_start=107
-  _LANDMARKS._serialized_end=154
+  _FD._serialized_start=37
+  _FD._serialized_end=193
+  _LANDMARKS._serialized_start=195
+  _LANDMARKS._serialized_end=242
+  _FACEOVAL._serialized_start=244
+  _FACEOVAL._serialized_end=290
 # @@protoc_insertion_point(module_scope)
