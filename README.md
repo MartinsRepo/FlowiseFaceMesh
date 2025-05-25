@@ -27,13 +27,16 @@ Open the sidetab Chatflows or Agentflows and add a new one:
  - *Visual Chatflow OpenAI.json* or *Visual Chatflow Deepseek_Ollama.json*
  - In the OpenAI version, add your OpenAI API Key in the chatModel.
  - In the local Ollama version, make sure, that:
-> your Ollama Server is started with: **OLLAMA_HOST=0.0.0.0:11434 ollama serve**    and
+> your Ollama Server is started with:
 
-> your ChatOllama in your imported Flowise model is set to: 
+    OLLAMA_HOST=0.0.0.0:11434 ollama serve
+> and your ChatOllama in your imported Flowise model is set to: 
 
     http://"your local PC IPaddress":11434
 
-> Select the model with the name, eg. **deepseek-r1:14b**
+> Select the model with the name, eg. 
+
+`deepseek-r1:14b`
 
 ### Step 3:
 Install the requirements.txt in a virtual python environment, eg pyenv or conda. 
@@ -47,7 +50,9 @@ Here, i used the env name: **ecal**
 
 ### Step 4: 
 Open two command windows, goto to your workspace and start the environment with eg.
-> pyenv activate ecal
+
+    pyenv activate ecal
+
 ### Step 5: 
 Install ECAL:
 [Landing page of ECAL](https://eclipse-ecal.github.io/ecal/stable/index.html)

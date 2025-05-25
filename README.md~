@@ -7,15 +7,18 @@ The Goal of this project is to connect external programs with a Large Language M
 ### Step 1:
 Flowise is for free and we will install a Docker image from the Docker Hub
 > [FlowiseAI from the Dockerhub](https://hub.docker.com/r/flowiseai/flowise)
-> docker pull flowiseai/flowise
+
+    docker pull flowiseai/flowise
 
 Then we start a container mapped to an external volume to store the projects permanently:
-> docker run -d --name flowise \
-  -v <your local folder>/root/.flowise \
-  -p 8000:3000 flowise
 
+    docker run 	-d --name flowise \
+			    -v <your local folder>/root/.flowise \
+			    -p 8000:3000 flowise
 After one or two minutes, you can access flowise in
-> http://localhost:8000/
+
+    http://localhost:8000/
+
 ### Step2:
 Open the sidetab Chatflows or Agentflows and add a new one:
 
@@ -26,11 +29,21 @@ Open the sidetab Chatflows or Agentflows and add a new one:
  - In the local Ollama version, make sure, that:
 > your Ollama Server is started with: **OLLAMA_HOST=0.0.0.0:11434 ollama serve**    and
 
-> your ChatOllama in your imported Flowise model is set to: **http://"your local PC IPaddress":11434**
+> your ChatOllama in your imported Flowise model is set to: 
+
+    http://"your local PC IPaddress":11434
 
 > Select the model with the name, eg. **deepseek-r1:14b**
+
 ### Step 3:
-Install the requirements.txt in a virtual python environment, eg pyenv or conda. Here, i used the env name: **ecal**
+Install the requirements.txt in a virtual python environment, eg pyenv or conda. 
+
+ - [**pyenv usage**](https://realpython.com/intro-to-pyenv/) 
+ - [**conda usage**](https://www.geeksforgeeks.org/set-up-virtual-environment-for-python-using-anaconda/)
+
+Here, i used the env name: **ecal**
+
+    pip install -r requirements.txt
 
 ### Step 4: 
 Open two command windows, goto to your workspace and start the environment with eg.
