@@ -4,6 +4,9 @@
 ## Installation
 The Goal of this project is to connect external programs with a Large Language Model, designed and running in Flowise.
 > [Flowise - # Build AI Agents Visually ](https://flowiseai.com/)
+
+![Workflow](workflow.jpg)
+
 ### Step 1:
 Flowise is for free and we will install a Docker image from the Docker Hub
 > [FlowiseAI from the Dockerhub](https://hub.docker.com/r/flowiseai/flowise)
@@ -24,7 +27,7 @@ Open the sidetab Chatflows or Agentflows and add a new one:
 
  - Import one model as JSON from src/FlowiseModel. 
  - Two models are available: 
- - *Visual Chatflow OpenAI.json* or *Visual Chatflow Deepseek_Ollama.json*
+ - *GithubFlowiseOpenAI Chatflow.json* or *Visual Chatflow Deepseek_Ollama.json*
  - In the OpenAI version, add your OpenAI API Key in the chatModel.
  - In the local Ollama version, make sure, that:
 > your Ollama Server is started with:
@@ -66,6 +69,8 @@ eCAL (**e**nhanced **C**ommunication **A**bstraction **L**ayer) is a fast publis
 It comes with some tools, like th eECAL-Monitor and the ECAL-Player.
 It is based on Protobuf messages, in our case like this:
 
+Model Input
+
     syntax = "proto3";
     package pb.facedetection;
     message FD{
@@ -86,7 +91,24 @@ It is based on Protobuf messages, in our case like this:
 	    int32 y = 3;
 	}
 
+	syntax = "proto3";
+
+Model output
+
+	package pb.flask;
+	message OUT{
+    string headline = 1;
+    string text = 2;
+    }
+
+
+
+
 So, the camera und the LLM model must not be on the same PC, PC - Raspberry also works.
+If need - compile the Proto-file:
+
+    protoc -I =. --python_out=. facemesh.proto
+    protoc -I =. --python_out=. modeloutput.proto
 
 ### B) What is a Facemesh?
 
@@ -100,5 +122,13 @@ For **Facedetection** we are using **Google Mediapipe**. [Link here](https://dev
 
 The result will something like this:
 ![screenshot](running.png)
+
+and the Ecal Messages are:
+![Ecal](ecal_setup.png)
+
+### Annotation
+Using the  **Microsoft Lifecam HD3000**, you can adjust the video frame.
+Keyboard shortcuts that you can use to manage the zoom out/in feature of camera:
+> **Zoom Out = Ctrl + Minus Key, Zoom In = Ctrl + Plus key, Zoom to 100% = Ctrl + Zero key**
 
 > Written with [StackEdit](https://stackedit.io/).

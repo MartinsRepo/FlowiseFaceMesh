@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package pb.flask;
+
+message OUT{
+    string headline = 1;
+    string text = 2;
+}
+
