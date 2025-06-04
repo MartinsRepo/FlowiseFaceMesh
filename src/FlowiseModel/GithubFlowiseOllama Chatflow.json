@@ -1,108 +1,104 @@
 {
   "nodes": [
     {
-      "id": "chatPromptTemplate_0",
+      "id": "postApiChain_0",
       "position": {
-        "x": -144.30987410133406,
-        "y": 495.1402793573229
+        "x": 2227.3186178623473,
+        "y": -305.3591669635455
       },
       "type": "customNode",
       "data": {
-        "id": "chatPromptTemplate_0",
-        "label": "Chat Prompt Template",
-        "version": 2,
-        "name": "chatPromptTemplate",
-        "type": "ChatPromptTemplate",
+        "id": "postApiChain_0",
+        "label": "POST API Chain",
+        "version": 1,
+        "name": "postApiChain",
+        "type": "POSTApiChain",
         "baseClasses": [
-          "ChatPromptTemplate",
-          "BaseChatPromptTemplate",
-          "BasePromptTemplate",
+          "POSTApiChain",
+          "BaseChain",
           "Runnable"
         ],
-        "category": "Prompts",
-        "description": "Schema to represent a chat prompt",
+        "category": "Chains",
+        "description": "Chain to run queries against POST API",
         "inputParams": [
           {
-            "label": "System Message",
-            "name": "systemMessagePrompt",
+            "label": "API Documentation",
+            "name": "apiDocs",
             "type": "string",
+            "description": "Description of how API works. Please refer to more <a target=\"_blank\" href=\"https://github.com/langchain-ai/langchain/blob/master/libs/langchain/langchain/chains/api/open_meteo_docs.py\">examples</a>",
             "rows": 4,
-            "placeholder": "You are a helpful assistant that translates {input_language} to {output_language}.",
-            "id": "chatPromptTemplate_0-input-systemMessagePrompt-string"
+            "id": "postApiChain_0-input-apiDocs-string"
           },
           {
-            "label": "Human Message",
-            "name": "humanMessagePrompt",
-            "description": "This prompt will be added at the end of the messages as human message",
-            "type": "string",
-            "rows": 4,
-            "placeholder": "{text}",
-            "id": "chatPromptTemplate_0-input-humanMessagePrompt-string"
-          },
-          {
-            "label": "Format Prompt Values",
-            "name": "promptValues",
+            "label": "Headers",
+            "name": "headers",
             "type": "json",
+            "additionalParams": true,
             "optional": true,
-            "acceptVariable": true,
-            "list": true,
-            "id": "chatPromptTemplate_0-input-promptValues-json"
+            "id": "postApiChain_0-input-headers-json"
           },
           {
-            "label": "Messages History",
-            "name": "messageHistory",
-            "description": "Add messages after System Message. This is useful when you want to provide few shot examples",
-            "type": "tabs",
-            "tabIdentifier": "selectedMessagesTab",
+            "label": "URL Prompt",
+            "name": "urlPrompt",
+            "type": "string",
+            "description": "Prompt used to tell LLMs how to construct the URL. Must contains {api_docs} and {question}",
+            "default": "You are given the below API Documentation:\n{api_docs}\nUsing this documentation, generate a json string with two keys: \"url\" and \"data\".\nThe value of \"url\" should be a string, which is the API url to call for answering the user question.\nThe value of \"data\" should be a dictionary of key-value pairs you want to POST to the url as a JSON body.\nBe careful to always use double quotes for strings in the json string.\nYou should build the json string in order to get a response that is as short as possible, while still getting the necessary information to answer the question. Pay attention to deliberately exclude any unnecessary pieces of data in the API call.\n\nQuestion:{question}\njson string:",
+            "rows": 4,
             "additionalParams": true,
-            "default": "messageHistoryCode",
-            "tabs": [
-              {
-                "label": "Add Messages (Code)",
-                "name": "messageHistoryCode",
-                "type": "code",
-                "hideCodeExecute": true,
-                "codeExample": "const { AIMessage, HumanMessage, ToolMessage } = require('@langchain/core/messages');\n\nreturn [\n    new HumanMessage(\"What is 333382 🦜 1932?\"),\n    new AIMessage({\n        content: \"\",\n        tool_calls: [\n        {\n            id: \"12345\",\n            name: \"calulator\",\n            args: {\n                number1: 333382,\n                number2: 1932,\n                operation: \"divide\",\n            },\n        },\n        ],\n    }),\n    new ToolMessage({\n        tool_call_id: \"12345\",\n        content: \"The answer is 172.558.\",\n    }),\n    new AIMessage(\"The answer is 172.558.\"),\n]",
-                "optional": true,
-                "additionalParams": true
-              }
-            ],
-            "id": "chatPromptTemplate_0-input-messageHistory-tabs"
+            "id": "postApiChain_0-input-urlPrompt-string"
+          },
+          {
+            "label": "Answer Prompt",
+            "name": "ansPrompt",
+            "type": "string",
+            "description": "Prompt used to tell LLMs how to return the API response. Must contains {api_response}, {api_url}, and {question}",
+            "default": "You are given the below API Documentation:\n{api_docs}\nUsing this documentation, generate a json string with two keys: \"url\" and \"data\".\nThe value of \"url\" should be a string, which is the API url to call for answering the user question.\nThe value of \"data\" should be a dictionary of key-value pairs you want to POST to the url as a JSON body.\nBe careful to always use double quotes for strings in the json string.\nYou should build the json string in order to get a response that is as short as possible, while still getting the necessary information to answer the question. Pay attention to deliberately exclude any unnecessary pieces of data in the API call.\n\nQuestion:{question}\njson string: {api_url_body}\n\nHere is the response from the API:\n\n{api_response}\n\nSummarize this response to answer the original question.\n\nSummary:",
+            "rows": 4,
+            "additionalParams": true,
+            "id": "postApiChain_0-input-ansPrompt-string"
           }
         ],
-        "inputAnchors": [],
+        "inputAnchors": [
+          {
+            "label": "Language Model",
+            "name": "model",
+            "type": "BaseLanguageModel",
+            "id": "postApiChain_0-input-model-BaseLanguageModel"
+          }
+        ],
         "inputs": {
-          "systemMessagePrompt": "You are an expert facial landmark interpreter.\nYou receive data in the following format:\n{{{question}}}\n\nAnalyze Martin’s head orientation and mouth behavior:\n- Is he looking up, down, or straight?\n- Is he speaking (mouth open)?\n- Is he smiling?\n\nRespond with a short analysis.\n\n\n",
-          "humanMessagePrompt": "",
-          "promptValues": "{\"question\":\"{{question}}\"}",
-          "messageHistory": "messageHistoryCode"
+          "model": "{{chatOllama_0.data.instance}}",
+          "apiDocs": "BASE URL: http://192.168.0.228:5000/\n\nAPI Endpoint: /api/interpret\nMethod: POST\nContent-Type: application/json\n\nRequest Body:\n{\n  \"text\": \"<Interpretation result from Flowise LLM>\"\n}\n\nResponse:\n{\n  \"status\": \"success\",\n  \"message\": \"Text received and logged successfully.\"\n}",
+          "headers": "",
+          "urlPrompt": "You are given the below API Documentation:\n{api_docs}\nUsing this documentation, generate a json string with two keys: \"url\" and \"data\".\nThe value of \"url\" should be a string, which is the API url to call for answering the user question.\nThe value of \"data\" should be a dictionary of key-value pairs you want to POST to the url as a JSON body.\nBe careful to always use double quotes for strings in the json string.\nYou should build the json string in order to get a response that is as short as possible, while still getting the necessary information to answer the question. Pay attention to deliberately exclude any unnecessary pieces of data in the API call.\n\nQuestion:{question}\njson string:",
+          "ansPrompt": "You are given the below API Documentation:\n{api_docs}\nUsing this documentation, generate a json string with two keys: \"url\" and \"data\".\nThe value of \"url\" should be a string, which is the API url to call for answering the user question.\nThe value of \"data\" should be a dictionary of key-value pairs you want to POST to the url as a JSON body.\nBe careful to always use double quotes for strings in the json string.\nYou should build the json string in order to get a response that is as short as possible, while still getting the necessary information to answer the question. Pay attention to deliberately exclude any unnecessary pieces of data in the API call.\n\nQuestion:{question}\njson string: {api_url_body}\n\nHere is the response from the API:\n\n{api_response}\n\nSummarize this response to answer the original question.\n\nSummary:"
         },
         "outputAnchors": [
           {
-            "id": "chatPromptTemplate_0-output-chatPromptTemplate-ChatPromptTemplate|BaseChatPromptTemplate|BasePromptTemplate|Runnable",
-            "name": "chatPromptTemplate",
-            "label": "ChatPromptTemplate",
-            "description": "Schema to represent a chat prompt",
-            "type": "ChatPromptTemplate | BaseChatPromptTemplate | BasePromptTemplate | Runnable"
+            "id": "postApiChain_0-output-postApiChain-POSTApiChain|BaseChain|Runnable",
+            "name": "postApiChain",
+            "label": "POSTApiChain",
+            "description": "Chain to run queries against POST API",
+            "type": "POSTApiChain | BaseChain | Runnable"
           }
         ],
         "outputs": {},
         "selected": false
       },
       "width": 300,
-      "height": 742,
+      "height": 460,
       "selected": false,
       "positionAbsolute": {
-        "x": -144.30987410133406,
-        "y": 495.1402793573229
+        "x": 2227.3186178623473,
+        "y": -305.3591669635455
       },
       "dragging": false
     },
     {
       "id": "conversationChain_0",
       "position": {
-        "x": 971.7667843367818,
-        "y": 279.127630351199
+        "x": 1974.392062972414,
+        "y": 182.7951973049603
       },
       "type": "customNode",
       "data": {
@@ -187,82 +183,16 @@
       "height": 435,
       "selected": false,
       "positionAbsolute": {
-        "x": 971.7667843367818,
-        "y": 279.127630351199
-      },
-      "dragging": false
-    },
-    {
-      "id": "bufferMemory_0",
-      "position": {
-        "x": 251.39493025983364,
-        "y": 464.03484089335666
-      },
-      "type": "customNode",
-      "data": {
-        "id": "bufferMemory_0",
-        "label": "Buffer Memory",
-        "version": 2,
-        "name": "bufferMemory",
-        "type": "BufferMemory",
-        "baseClasses": [
-          "BufferMemory",
-          "BaseChatMemory",
-          "BaseMemory"
-        ],
-        "category": "Memory",
-        "description": "Retrieve chat messages stored in database",
-        "inputParams": [
-          {
-            "label": "Session Id",
-            "name": "sessionId",
-            "type": "string",
-            "description": "If not specified, a random id will be used. Learn <a target=\"_blank\" href=\"https://docs.flowiseai.com/memory#ui-and-embedded-chat\">more</a>",
-            "default": "",
-            "additionalParams": true,
-            "optional": true,
-            "id": "bufferMemory_0-input-sessionId-string"
-          },
-          {
-            "label": "Memory Key",
-            "name": "memoryKey",
-            "type": "string",
-            "default": "chat_history",
-            "additionalParams": true,
-            "id": "bufferMemory_0-input-memoryKey-string"
-          }
-        ],
-        "inputAnchors": [],
-        "inputs": {
-          "sessionId": "",
-          "memoryKey": "chat_history"
-        },
-        "outputAnchors": [
-          {
-            "id": "bufferMemory_0-output-bufferMemory-BufferMemory|BaseChatMemory|BaseMemory",
-            "name": "bufferMemory",
-            "label": "BufferMemory",
-            "description": "Retrieve chat messages stored in database",
-            "type": "BufferMemory | BaseChatMemory | BaseMemory"
-          }
-        ],
-        "outputs": {},
-        "selected": false
-      },
-      "width": 300,
-      "height": 253,
-      "selected": false,
-      "positionAbsolute": {
-        "x": 251.39493025983364,
-        "y": 464.03484089335666
+        "x": 1974.392062972414,
+        "y": 182.7951973049603
       },
       "dragging": false
     },
     {
       "id": "chatOllama_0",
       "position": {
-        "x": -658.875520615758,
-        "y": -237.00228720791915
+        "x": 907.5721316957959,
+        "y": -322.7787680170676
       },
       "type": "customNode",
       "data": {
@@ -477,7 +407,7 @@
           "cache": "",
           "baseUrl": "http://192.168.0.228:11434",
           "modelName": "deepseek-r1:14b",
-          "temperature": "0.5",
+          "temperature": 0.9,
           "allowImageUploads": "",
           "streaming": true,
           "jsonMode": "",
@@ -511,21 +441,177 @@
       "height": 676,
       "selected": false,
       "positionAbsolute": {
-        "x": -658.875520615758,
-        "y": -237.00228720791915
+        "x": 907.5721316957959,
+        "y": -322.7787680170676
+      },
+      "dragging": false
+    },
+    {
+      "id": "bufferMemory_0",
+      "position": {
+        "x": 1269.245654694112,
+        "y": 368.8578799435636
+      },
+      "type": "customNode",
+      "data": {
+        "id": "bufferMemory_0",
+        "label": "Buffer Memory",
+        "version": 2,
+        "name": "bufferMemory",
+        "type": "BufferMemory",
+        "baseClasses": [
+          "BufferMemory",
+          "BaseChatMemory",
+          "BaseMemory"
+        ],
+        "category": "Memory",
+        "description": "Retrieve chat messages stored in database",
+        "inputParams": [
+          {
+            "label": "Session Id",
+            "name": "sessionId",
+            "type": "string",
+            "description": "If not specified, a random id will be used. Learn <a target=\"_blank\" href=\"https://docs.flowiseai.com/memory#ui-and-embedded-chat\">more</a>",
+            "default": "",
+            "additionalParams": true,
+            "optional": true,
+            "id": "bufferMemory_0-input-sessionId-string"
+          },
+          {
+            "label": "Memory Key",
+            "name": "memoryKey",
+            "type": "string",
+            "default": "chat_history",
+            "additionalParams": true,
+            "id": "bufferMemory_0-input-memoryKey-string"
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "sessionId": "",
+          "memoryKey": "chat_history"
+        },
+        "outputAnchors": [
+          {
+            "id": "bufferMemory_0-output-bufferMemory-BufferMemory|BaseChatMemory|BaseMemory",
+            "name": "bufferMemory",
+            "label": "BufferMemory",
+            "description": "Retrieve chat messages stored in database",
+            "type": "BufferMemory | BaseChatMemory | BaseMemory"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 253,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1269.245654694112,
+        "y": 368.8578799435636
+      },
+      "dragging": false
+    },
+    {
+      "id": "chatPromptTemplate_0",
+      "position": {
+        "x": 904.9075035467704,
+        "y": 612.7499598991224
+      },
+      "type": "customNode",
+      "data": {
+        "id": "chatPromptTemplate_0",
+        "label": "Chat Prompt Template",
+        "version": 2,
+        "name": "chatPromptTemplate",
+        "type": "ChatPromptTemplate",
+        "baseClasses": [
+          "ChatPromptTemplate",
+          "BaseChatPromptTemplate",
+          "BasePromptTemplate",
+          "Runnable"
+        ],
+        "category": "Prompts",
+        "description": "Schema to represent a chat prompt",
+        "inputParams": [
+          {
+            "label": "System Message",
+            "name": "systemMessagePrompt",
+            "type": "string",
+            "rows": 4,
+            "placeholder": "You are a helpful assistant that translates {input_language} to {output_language}.",
+            "id": "chatPromptTemplate_0-input-systemMessagePrompt-string"
+          },
+          {
+            "label": "Human Message",
+            "name": "humanMessagePrompt",
+            "description": "This prompt will be added at the end of the messages as human message",
+            "type": "string",
+            "rows": 4,
+            "placeholder": "{text}",
+            "id": "chatPromptTemplate_0-input-humanMessagePrompt-string"
+          },
+          {
+            "label": "Format Prompt Values",
+            "name": "promptValues",
+            "type": "json",
+            "optional": true,
+            "acceptVariable": true,
+            "list": true,
+            "id": "chatPromptTemplate_0-input-promptValues-json"
+          },
+          {
+            "label": "Messages History",
+            "name": "messageHistory",
+            "description": "Add messages after System Message. This is useful when you want to provide few shot examples",
+            "type": "tabs",
+            "tabIdentifier": "selectedMessagesTab",
+            "additionalParams": true,
+            "default": "messageHistoryCode",
+            "tabs": [
+              {
+                "label": "Add Messages (Code)",
+                "name": "messageHistoryCode",
+                "type": "code",
+                "hideCodeExecute": true,
+                "codeExample": "const { AIMessage, HumanMessage, ToolMessage } = require('@langchain/core/messages');\n\nreturn [\n    new HumanMessage(\"What is 333382 🦜 1932?\"),\n    new AIMessage({\n        content: \"\",\n        tool_calls: [\n        {\n            id: \"12345\",\n            name: \"calulator\",\n            args: {\n                number1: 333382,\n                number2: 1932,\n                operation: \"divide\",\n            },\n        },\n        ],\n    }),\n    new ToolMessage({\n        tool_call_id: \"12345\",\n        content: \"The answer is 172.558.\",\n    }),\n    new AIMessage(\"The answer is 172.558.\"),\n]",
+                "optional": true,
+                "additionalParams": true
+              }
+            ],
+            "id": "chatPromptTemplate_0-input-messageHistory-tabs"
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "systemMessagePrompt": "You are an expert facial landmark interpreter.\nYou receive data in the following format:\n{{{question}}}\n\nAnalyze Martin’s head orientation and mouth behavior:\n- Is he looking up, down, or straight?\n- Is he speaking (mouth open)?\n- Is he smiling?\n\nRespond with a short analysis.",
+          "humanMessagePrompt": "",
+          "promptValues": "{\"question\":\"{{question}}\"}",
+          "messageHistory": "messageHistoryCode"
+        },
+        "outputAnchors": [
+          {
+            "id": "chatPromptTemplate_0-output-chatPromptTemplate-ChatPromptTemplate|BaseChatPromptTemplate|BasePromptTemplate|Runnable",
+            "name": "chatPromptTemplate",
+            "label": "ChatPromptTemplate",
+            "description": "Schema to represent a chat prompt",
+            "type": "ChatPromptTemplate | BaseChatPromptTemplate | BasePromptTemplate | Runnable"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 742,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 904.9075035467704,
+        "y": 612.7499598991224
       },
       "dragging": false
     }
   ],
   "edges": [
-    {
-      "source": "chatPromptTemplate_0",
-      "sourceHandle": "chatPromptTemplate_0-output-chatPromptTemplate-ChatPromptTemplate|BaseChatPromptTemplate|BasePromptTemplate|Runnable",
-      "target": "conversationChain_0",
-      "targetHandle": "conversationChain_0-input-chatPromptTemplate-ChatPromptTemplate",
-      "type": "buttonedge",
-      "id": "chatPromptTemplate_0-chatPromptTemplate_0-output-chatPromptTemplate-ChatPromptTemplate|BaseChatPromptTemplate|BasePromptTemplate|Runnable-conversationChain_0-conversationChain_0-input-chatPromptTemplate-ChatPromptTemplate"
-    },
     {
       "source": "bufferMemory_0",
       "sourceHandle": "bufferMemory_0-output-bufferMemory-BufferMemory|BaseChatMemory|BaseMemory",
@@ -537,10 +623,26 @@
     {
       "source": "chatOllama_0",
       "sourceHandle": "chatOllama_0-output-chatOllama-ChatOllama|ChatOllama|BaseChatModel|BaseLanguageModel|Runnable",
+      "target": "postApiChain_0",
+      "targetHandle": "postApiChain_0-input-model-BaseLanguageModel",
+      "type": "buttonedge",
+      "id": "chatOllama_0-chatOllama_0-output-chatOllama-ChatOllama|ChatOllama|BaseChatModel|BaseLanguageModel|Runnable-postApiChain_0-postApiChain_0-input-model-BaseLanguageModel"
+    },
+    {
+      "source": "chatOllama_0",
+      "sourceHandle": "chatOllama_0-output-chatOllama-ChatOllama|ChatOllama|BaseChatModel|BaseLanguageModel|Runnable",
       "target": "conversationChain_0",
       "targetHandle": "conversationChain_0-input-model-BaseChatModel",
       "type": "buttonedge",
       "id": "chatOllama_0-chatOllama_0-output-chatOllama-ChatOllama|ChatOllama|BaseChatModel|BaseLanguageModel|Runnable-conversationChain_0-conversationChain_0-input-model-BaseChatModel"
+    },
+    {
+      "source": "chatPromptTemplate_0",
+      "sourceHandle": "chatPromptTemplate_0-output-chatPromptTemplate-ChatPromptTemplate|BaseChatPromptTemplate|BasePromptTemplate|Runnable",
+      "target": "conversationChain_0",
+      "targetHandle": "conversationChain_0-input-chatPromptTemplate-ChatPromptTemplate",
+      "type": "buttonedge",
+      "id": "chatPromptTemplate_0-chatPromptTemplate_0-output-chatPromptTemplate-ChatPromptTemplate|BaseChatPromptTemplate|BasePromptTemplate|Runnable-conversationChain_0-conversationChain_0-input-chatPromptTemplate-ChatPromptTemplate"
     }
   ]
 }
