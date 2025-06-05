@@ -128,9 +128,15 @@ Import the Flowise model from your **src/FlowiseModel** path in the Flowise bros
 ### Step 2:
  - Adapt your .env files with the correct Flowise ID (to be found on the project browser tab and looks something like: adb94663-c66b-49f7-87f1-7788aff22a7a
  - Open 3 terminal windows, activate the virtual environment and go the src folder
- - Run in the first terminal window : **python facemesh2ecal.py**
- - Run in the second terminal window: **python ecal2flowise.py**
- - Run in the third terminal window : **flaskendpoint.py**
+ - Run in the first terminal window : 
+
+    python facemesh2ecal.py
+ - Run in the second terminal window: 
+
+    python ecal2flowise.py
+ - Run in the third terminal window : 
+
+    python flaskendpoint.py
 
 The result will something like this:
 ![screenshot](running.png)
