@@ -2,7 +2,7 @@
 # FlowiseMesh - Textual Facedetection with LLM
 
 ## License 
-Google Mediapipe, flowiseai/flowise in Dockerhub and Ecal are licensed under [Apache Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). This repo follows the licence terms.
+**Google Mediapipe**, **flowiseai/flowise** in Dockerhub and **Ecal** are licensed under [Apache Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). This repo follows the licence terms.
 
 ## Installation
 The Goal of this project is to connect external programs with a Large Language Model, designed and running in Flowise.
