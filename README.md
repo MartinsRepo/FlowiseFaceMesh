@@ -115,7 +115,14 @@ If need - compile the Proto-file:
 For **Facedetection** we are using **Google Mediapipe**. [Link here](https://developers.google.com/mediapipe/solutions). From this we are using the solutions [Face Landmarker](https://developers.google.com/mediapipe/solutions/vision/face_landmarker) and [Hand Landmarker](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker). The canonical Face Landmark Model is shown here: [Canonical Face Model](https://github.com/google/mediapipe/issues/1854). The model, used here, can be found on [mediapipe solutions](https://github.com/google/mediapipe/blob/master/docs/solutions/models.md).
 
 ### C) Running the Modules
+### Step 1:
+Import the Flowise model from your **src/FlowiseModel** path in the Flowise broswer tab:
 
+- Create a new Agent Flow or Chat Flow by pressing **Add New** and
+- **Load Chatflow** from the settings tab, eg: **GithubFlowiseOpenAI Chatflow.json**
+![import](import.png)
+- Save the model after adding your creditentials
+### Step 2:
  - Adapt your .env files with the correct Flowise ID (to be found on the project browser tab and looks something like: adb94663-c66b-49f7-87f1-7788aff22a7a
  - Run in one terminal window: **python facemesh2ecal.py**  and 
  - in the other python ecal2flowise.py
