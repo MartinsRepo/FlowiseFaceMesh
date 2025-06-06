@@ -16,10 +16,10 @@ pub = ProtoPublisher("from Flask",modeloutput_pb2.OUT)
 
 
 def genECALdata(text):
-    data2ecal = modeloutput_pb2.OUT()
-    data2ecal.headline = "LLM Answer"
-    data2ecal.text = text
-    pub.send(data2ecal)
+    pub2ecal = modeloutput_pb2.OUT()
+    pub2ecal.headline = "LLM Answer"
+    pub2ecal.text = text
+    pub.send(pub2ecal)
 
 
 @app.route('/api/interpret', methods=['POST'])
@@ -38,7 +38,6 @@ def interpret_face():
         # Do something with the interpretation text
         interpretation_text = data["text"]
         print("LLM Interpretation:", interpretation_text)
-        #wrapped_text = textwrap.fill(interpretation_text, width=80)
         wrapper = textwrap.TextWrapper(width=80, subsequent_indent='  ')
         formatted = "\n".join(wrapper.fill(line) if not line.startswith("-") else wrapper.fill(line) for line in interpretation_text.splitlines())
 

@@ -1,11 +1,9 @@
 syntax = "proto3";
 
-package pb.facedetection;
+package pb.facedata;
 
-message FD{
+message FaceData{
     string filename = 1;
-    int32 framewidth = 2;
-    int32 frameheight = 3;
     repeated Landmarks packedlM = 4; //array of landmark data, packaged to reduce sampling rate
     repeated FaceOval packedFO = 5; // Additional face oval landmarks
 }

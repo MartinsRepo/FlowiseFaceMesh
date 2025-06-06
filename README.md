@@ -75,7 +75,7 @@ It is based on Protobuf messages, in our case like this:
 Model Input
 
     syntax = "proto3";
-    package pb.facedetection;
+    package pb.facedata;
     message FD{
 	    string filename = 1;
 	    int32 framewidth = 2;
@@ -110,7 +110,7 @@ Model output
 So, the camera und the LLM model must not be on the same PC, PC - Raspberry also works.
 If need - compile the Proto-file:
 
-    protoc -I =. --python_out=. facemesh.proto
+    protoc -I =. --python_out=. facedata.proto
     protoc -I =. --python_out=. modeloutput.proto
 
 ### B) What is a Facemesh?

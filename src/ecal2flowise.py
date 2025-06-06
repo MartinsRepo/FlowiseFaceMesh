@@ -11,7 +11,7 @@ import threading
 import requests
 import ecal.core.core as ecal_core
 from ecal.core.subscriber import ProtoSubscriber
-import facemesh_pb2
+import facedata_pb2
 from dotenv import load_dotenv
 import time
 #from queue import Queue
@@ -149,7 +149,7 @@ def callback(topic_name, msg, t):
 def main():
     print("Initializing eCAL...")
     ecal_core.initialize(sys.argv, "Camera")
-    sub = ProtoSubscriber("FaceCoords", facemesh_pb2.FD)
+    sub = ProtoSubscriber("FaceData", facedata_pb2.FaceData)
     sub.set_callback(callback)
 
     try:

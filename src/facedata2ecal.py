@@ -1,5 +1,5 @@
 # Proto file compilation:
-# protoc -I =. --python_out=. facemesh.proto
+# protoc -I =. --python_out=. facedata.proto
 
 # Microsoft LiveCam - Adjust image
 # keyboard shortcuts that you can use to manage the zoom out/in feature of camera: 
@@ -14,7 +14,7 @@ from mediapipe.tasks import python
 import mediapipe as mp
 import ecal.core.core as ecal_core
 from ecal.core.publisher import ProtoPublisher
-import facemesh_pb2
+import facedata_pb2
 
 # drawing utilities from solutions API
 mp_drawing = mp.solutions.drawing_utils
@@ -96,11 +96,11 @@ def should_publish(prev, curr, frac=0.008):
 def EcalSetup():
     ecal_core.initialize(sys.argv, "Camera")
     ecal_core.set_process_state(1, 1, "Ready to publish")
-    return ProtoPublisher("FaceCoords", facemesh_pb2.FD)
+    return ProtoPublisher("FaceData", facedata_pb2.FaceData)
 
 # Populate protobuf message
 def PubFaceMesh(facemarkers, all_points):
-    msg = facemesh_pb2.FD()
+    msg = facedata_pb2.FaceData()
     msg.filename = 'Ecal2Flowise'
     msg.framewidth = global_width
     msg.frameheight = global_height
