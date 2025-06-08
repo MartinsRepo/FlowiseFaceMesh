@@ -10,7 +10,7 @@ Martin Hummel
 import requests
 import json
 import time
-import facemesh_pb2
+import facedata_pb2
 
 FLOW_ID = "43db1b2b-1ceb-44a4-a227-0ae90738fe47"  # Substitute with your Flow-ID
 FLOWISE_API_URL = f"http://localhost:8000/api/v1/prediction/{FLOW_ID}"
@@ -82,7 +82,7 @@ face_oval_data = [
 def generate_Ecal_sim_msg():
 
   # Create an instance of the FD message
-  fd_message = facemesh_pb2.FD()
+  fd_message = facemesh_pb2.FaceData()
 
   # Populate the simple fields
   fd_message.filename = payload['question']['message']
