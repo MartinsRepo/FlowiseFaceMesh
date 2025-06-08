@@ -4,8 +4,8 @@ package pb.facedata;
 
 message FaceData{
     string filename = 1;
-    repeated Landmarks packedlM = 4; //array of landmark data, packaged to reduce sampling rate
-    repeated FaceOval packedFO = 5; // Additional face oval landmarks
+    repeated Landmarks packedlM = 2; //array of landmark data, packaged to reduce sampling rate
+    repeated FaceOval packedFO = 3; // Additional face oval landmarks
 }
 
 message Landmarks{

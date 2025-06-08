@@ -72,16 +72,15 @@ eCAL (**e**nhanced **C**ommunication **A**bstraction **L**ayer) is a fast publis
 It comes with some tools, like th eECAL-Monitor and the ECAL-Player.
 It is based on Protobuf messages, in our case like this:
 
+
 Model Input
 
     syntax = "proto3";
     package pb.facedata;
-    message FD{
+    message FaceData{
 	    string filename = 1;
-	    int32 framewidth = 2;
-	    int32 frameheight = 3;
-	    repeated Landmarks packedlM = 4; //array of landmark data, packaged to reduce sampling rate
-	    repeated FaceOval packedFO = 5; // Additional face oval landmarks
+	    repeated Landmarks packedlM = 2; //array of landmark data, packaged to reduce sampling rate
+	    repeated FaceOval packedFO = 3; // Additional face oval landmarks
 	 }
 	message Landmarks{
 	    string name = 1;
@@ -94,10 +93,9 @@ Model Input
 	    int32 y = 3;
 	}
 
-	syntax = "proto3";
-
 Model output
 
+	syntax = "proto3";
 	package pb.flask;
 	message OUT{
     string headline = 1;
