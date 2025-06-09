@@ -102,8 +102,7 @@ def EcalSetup():
 def PubFaceMesh(facemarkers, all_points):
     msg = facedata_pb2.FaceData()
     msg.filename = 'Ecal2Flowise'
-    msg.framewidth = global_width
-    msg.frameheight = global_height
+
     # add selected landmarks
     for name, (x, y) in zip(enum_LM, facemarkers):
         lm = msg.packedlM.add()
@@ -120,22 +119,22 @@ def PubFaceMesh(facemarkers, all_points):
     return msg
 
 def render_mesh(image, landmarks):
-        # Draw tessellation
-        mp_drawing.draw_landmarks(
-            image=image,
-            landmark_list=landmarks,
-            connections=mp_face_mesh.FACEMESH_TESSELATION,
-            landmark_drawing_spec=None,
-            connection_drawing_spec=mp_drawing_styles.get_default_face_mesh_tesselation_style()
-        )
-        # Draw contours
-        mp_drawing.draw_landmarks(
-            image=image,
-            landmark_list=landmarks,
-            connections=mp_face_mesh.FACEMESH_CONTOURS,
-            landmark_drawing_spec=None,
-            connection_drawing_spec=mp_drawing_styles.get_default_face_mesh_contours_style()
-        )
+    # Draw tessellation
+    mp_drawing.draw_landmarks(
+        image=image,
+        landmark_list=landmarks,
+        connections=mp_face_mesh.FACEMESH_TESSELATION,
+        landmark_drawing_spec=None,
+        connection_drawing_spec=mp_drawing_styles.get_default_face_mesh_tesselation_style()
+    )
+    # Draw contours
+    mp_drawing.draw_landmarks(
+        image=image,
+        landmark_list=landmarks,
+        connections=mp_face_mesh.FACEMESH_CONTOURS,
+        landmark_drawing_spec=None,
+        connection_drawing_spec=mp_drawing_styles.get_default_face_mesh_contours_style()
+    )
 
 
 if __name__ == '__main__':

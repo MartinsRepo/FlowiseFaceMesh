@@ -13,7 +13,6 @@ import ecal.core.core as ecal_core
 from ecal.core.subscriber import ProtoSubscriber
 import facedata_pb2
 from dotenv import load_dotenv
-import time
 #from queue import Queue
 
 
