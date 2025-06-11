@@ -11,97 +11,54 @@
 # keyboard shortcuts that you can use to manage the zoom out/in feature of camera: 
 # Zoom Out = Ctrl + Minus Key, Zoom In = Ctrl + Plus key, Zoom to 100% = Ctrl + Zero key. 
 
-
-import sys, os, cv2, time, math, zmq, json, requests
+import sys, os, cv2, time, math, zmq, json, requests, multiprocessing
 import numpy as np
 from mediapipe.tasks.python import vision
 from mediapipe.tasks import python
 import mediapipe as mp
 from dotenv import load_dotenv
+from multiprocessing import Queue, Process
 
-# drawing utilities from solutions API
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_face_mesh = mp.solutions.face_mesh
 
-context = zmq.Context()
-socket = context.socket(zmq.PUB)
-socket.bind("tcp://*:5555")  # Binds to all interfaces on port 5555
-
-# Load configuration from .env file
 load_dotenv()
 FLOW_ID = os.getenv('FLOWID')
 FLOWISE_API_URL = f"http://flowise:3000/api/v1/prediction/{FLOW_ID}"
-
-
-# Default model filename adjacent to project root
-default_model = 'face_landmarker_v2_with_blendshapes.task'
+FLASK_API_URL = "http://192.168.0.228:5000/api/interpret"
 
 face_oval_indices = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361,
                      288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149,
                      150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103,
                      67, 109]
 
-# Landmark indices for face features of interest (12 points)
 enum_LM = ["nose", "chin", "left eye", "upper lid left", "lower lid left",
            "right eye", "upper lid right", "lower lid right",
            "left mouth", "right mouth", "upper lip", "lower lip"]
-           
-face_data_dict = {
-	    "filename": 'Processed frame data',
-	    "packedlM": [],  # List to hold landmark dictionaries
-	    "packedFO": []   # List to hold face oval dictionaries
-	}
 
-# Corresponding mesh indices
 mesh_indices = [19, 152, 226, 27, 23, 446, 257, 253, 57, 287, 0, 7]
 
-# Globals for image dims and previous landmarks
-global_width,global_height = 1,1
-prev_landmarks = None
-
-# Initialize Mediapipe face landmarker
 def init_detector():
-	base_options = python.BaseOptions(model_asset_path=default_model)
-	options = vision.FaceLandmarkerOptions(
-		base_options=base_options,
-		output_face_blendshapes=True,
-		output_facial_transformation_matrixes=True,
-		num_faces=1
-	)
-	return vision.FaceLandmarker.create_from_options(options)
+    base_options = python.BaseOptions(model_asset_path='face_landmarker_v2_with_blendshapes.task')
+    options = vision.FaceLandmarkerOptions(
+        base_options=base_options,
+        output_face_blendshapes=True,
+        output_facial_transformation_matrixes=True,
+        num_faces=1
+    )
+    return vision.FaceLandmarker.create_from_options(options)
 
-
-def detect_landmarks(detector, image):
-	result = detector.detect(image)
-	if not result.face_landmarks:
-		return None, None
-    # extract 2D points and all mesh points
-	landmarks = result.face_landmarks[0]
-	all_points = [(int(lm.x * global_width), int(lm.y * global_height)) for lm in landmarks]
-	points = []
-	for idx in mesh_indices:
-		x, y = all_points[idx]
-		points.append((x, y))
-	return points, all_points
-
-
-# Decide if publish: compute fraction of points moved more than threshold (10% of frame width or height)
-def should_publish(prev, curr, frac=0.008):
-	if prev is None:
-		return True
-	moved = 0
-	threshold_x = global_width * frac
-	threshold_y = global_height * frac
-	for (x0, y0), (x1, y1) in zip(prev, curr):
-		if abs(x1 - x0) > threshold_x or abs(y1 - y0) > threshold_y:
-			moved += 1
-	# publish if more than 10% of landmarks moved
-	return moved >= math.ceil(len(curr) * frac)
-
+def detect_landmarks(detector, image, width, height):
+    result = detector.detect(image)
+    if not result.face_landmarks:
+        return None, None
+    landmarks = result.face_landmarks[0]
+    all_points = [(int(lm.x * width), int(lm.y * height)) for lm in landmarks]
+    points = [(all_points[idx][0], all_points[idx][1]) for idx in mesh_indices]
+    return points, all_points
 
 def render_mesh(image, landmarks):
-    # Draw tessellation
     mp_drawing.draw_landmarks(
         image=image,
         landmark_list=landmarks,
@@ -109,7 +66,6 @@ def render_mesh(image, landmarks):
         landmark_drawing_spec=None,
         connection_drawing_spec=mp_drawing_styles.get_default_face_mesh_tesselation_style()
     )
-    # Draw contours
     mp_drawing.draw_landmarks(
         image=image,
         landmark_list=landmarks,
@@ -119,141 +75,116 @@ def render_mesh(image, landmarks):
     )
 
 def GenFaceMesh(facemarkers, all_points):
-	
-    # add selected landmarks
-	for name, (x, y) in zip(enum_LM, facemarkers):
-		lm_dict = {
-			"name": name,
-			"x": x,
-			"y": y
-		}
-		face_data_dict["packedlM"].append(lm_dict)
-
-    # add full face oval
-	for idx in face_oval_indices:
-		x, y = all_points[idx]
-		ov_dict = {
-			"name": f"oval_{idx}",
-			"x": x,
-			"y": y
-		}
-		face_data_dict["packedFO"].append(ov_dict)
-        
-	return face_data_dict
-	
+    packedlM = []
+    packedFO = []
+    for name, (x, y) in zip(enum_LM, facemarkers):
+        packedlM.append({"name": name, "x": x, "y": y})
+    for idx in face_oval_indices:
+        x, y = all_points[idx]
+        packedFO.append({"name": f"oval_{idx}", "x": x, "y": y})
+    return {"filename": "Processed frame data", "packedlM": packedlM, "packedFO": packedFO}
 
 def convert_protobuf_to_dict(input_dict):
-
-    """
-    Convert a face data dictionary (expected to be similar to the protobuf structure)
-    to a simplified dict with 'message' (filename) and 'landmarks' list.
-
-    Args:
-        input_dict (dict): A dictionary containing face data.
-                           Expected keys: 'filename' (string) and 'packedlM' (list of dicts).
-                           Each dict in 'packedlM' is expected to have 'x', 'y', 'name' keys.
-
-    Returns:
-        dict: A simplified dictionary with 'message' (filename) and 'landmarks' list.
-    """
-    # Access 'filename' using dictionary key lookup.
-    # Using .get() with a default value to handle cases where the key might be missing.
     frame_data = {'message': input_dict.get('filename', 'Filename not found')}
-
-    landmarks = []
-    # Iterate through the list of landmark dictionaries under the 'packedlM' key.
-    # Using .get() with an empty list as default to prevent errors if 'packedlM' is missing.
-    for lm_dict in input_dict.get('packedlM', []):
-        landmarks.append({
-            'x': lm_dict.get('x'),
-            'y': lm_dict.get('y'),
-            'name': lm_dict.get('name')
-        })
+    landmarks = [
+        {"x": lm.get("x"), "y": lm.get("y"), "name": lm.get("name")}
+        for lm in input_dict.get("packedlM", [])
+    ]
     frame_data['landmarks'] = landmarks
     return frame_data
-    
 
-def handle_llm_response(response):
-    """
-    Process and display the response from Flowise.
-    """
-    try:
-        data = response.json()
-    except json.JSONDecodeError:
-        print("Invalid JSON response:", response.text)
-        return
+def cam_capture(raw_frame_queue):
+    cap = cv2.VideoCapture(0)
+    while True:
+        ret, frame = cap.read()
+        if ret:
+            raw_frame_queue.put(frame)
+        time.sleep(0.01)
 
-    if response.status_code == 200:
-        print("Status Code:", response.status_code)
-        print("Output from LLM:")
-        #llm_text = response_json.get("text")
-        llm_text = data.get("text")
-        print(llm_text)
-        print("Chat ID:", data.get('chatId'), "Message ID:", data.get('chatMessageId'))
+def landmark_process(raw_frame_queue, annotated_frame_queue, llm_queue):
+    detector = init_detector()
+    mesh_drawer = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1)
+    prev_landmarks = None
 
-        # Send to Flask
-        print("\n--- Sending to Flask API ---")
-        #flask_response = requests.post(FLASK_API_URL, json={"text": llm_text})
+    while True:
+        frame = raw_frame_queue.get()
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        height, width = rgb.shape[:2]
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        cur_pts, all_pts = detect_landmarks(detector, mp_image, width, height)
 
-        if flask_response.status_code == 200:
-            print("✅ Flask API Success:")
-            #print(flask_response.json().get("message"))
-        else:
-            print("❌ Flask API Error:")
-            print("Status Code:", flask_response.status_code)
-            print("Response:", flask_response.text)
-        print('Output finished')
-    else:
-        print(f"Error {response.status_code}: {data.get('message')}")
-        if data.get('stack'):
-            print(data.get('stack'))
+        if cur_pts:
+            if prev_landmarks is None or any(abs(x1 - x0) > 3 or abs(y1 - y0) > 3 for (x0, y0), (x1, y1) in zip(prev_landmarks, cur_pts)):
+                msg = GenFaceMesh(cur_pts, all_pts)
+                payload = {"question": convert_protobuf_to_dict(msg)}
+                llm_queue.put(payload)
+                prev_landmarks = cur_pts.copy()
 
+        result = mesh_drawer.process(rgb)
+        if result.multi_face_landmarks:
+            for fl in result.multi_face_landmarks:
+                render_mesh(frame, fl)
+
+        annotated_frame_queue.put(frame)
+
+
+def zmq_streamer(annotated_frame_queue):
+    context = zmq.Context()
+    socket = context.socket(zmq.PUB)
+    socket.bind("tcp://*:5555")
+    while True:
+        frame = annotated_frame_queue.get()
+        _, buffer = cv2.imencode('.jpg', frame)
+        socket.send(buffer.tobytes())
+
+
+def llm_process(llm_queue, flask_queue):
+    while True:
+        payload = llm_queue.get()
+        try:
+            response = requests.post(FLOWISE_API_URL, json=payload)
+            if response.status_code == 200:
+                data = response.json()
+                print("LLM Output:", data.get("text"))
+                flask_queue.put({"text": data.get("text")})
+            else:
+                print("LLM Error:", response.status_code)
+        except Exception as e:
+            print("LLM call failed:", e)
+
+
+def flask_process(flask_queue):
+    while True:
+        payload = flask_queue.get()
+        try:
+            print("\n--- Sending to Flask API ---")
+            response = requests.post(FLASK_API_URL, json=payload)
+            print("Flask response:", response.status_code)
+        except Exception as e:
+            print("Flask call failed:", e)
+
+
+def main():
+    raw_frame_queue = Queue()
+    annotated_frame_queue = Queue()
+    llm_queue = Queue()
+    flask_queue = Queue()
+
+    processes = [
+        Process(target=cam_capture, args=(raw_frame_queue,), daemon=True),
+        Process(target=landmark_process, args=(raw_frame_queue, annotated_frame_queue, llm_queue), daemon=True),
+        Process(target=zmq_streamer, args=(annotated_frame_queue,), daemon=True),
+        Process(target=llm_process, args=(llm_queue, flask_queue), daemon=True),
+        Process(target=flask_process, args=(flask_queue,), daemon=True)
+    ]
+
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
 
 if __name__ == '__main__':
-	detector = init_detector()
-
-	# FaceMesh solution for drawing
-	mesh_drawer = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1)
-
-	cap = cv2.VideoCapture(0)
-	if not cap.isOpened():
-		sys.exit(1)
-	while True:
-		ret, frame = cap.read()
-		if not ret:
-			break
-		# convert and update dims
-		rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-		global_height, global_width = rgb.shape[:2]
-		mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-		cur_pts, all_pts = detect_landmarks(detector, mp_image)
-        
-		if cur_pts and should_publish(prev_landmarks, cur_pts):
-			msg = GenFaceMesh(cur_pts, all_pts)
-			frame_data = convert_protobuf_to_dict(msg)
-			payload = {"question": frame_data}
-			response = requests.post(FLOWISE_API_URL, json=payload)
-			handle_llm_response(response)
-			
-			prev_landmarks = cur_pts.copy()
-        
-            
-		# Render mesh overlay
-		result = mesh_drawer.process(rgb)
-		if result.multi_face_landmarks:
-			for fl in result.multi_face_landmarks:
-				render_mesh(frame, fl)
-        
-		# send frame outside the docker container   
-		_, buffer = cv2.imencode('.jpg', frame)
-		socket.send(buffer.tobytes())
-		time.sleep(0.03)  # ~30 FPS
-            
-	cap.release()
-
-    
-
-
+    main()
 
 
 
