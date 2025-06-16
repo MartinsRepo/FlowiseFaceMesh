@@ -25,6 +25,7 @@ RUN pip3 install -r requirements.txt
 COPY face_landmarker_v2_with_blendshapes.task .
 COPY cam2flowise.py .
 COPY .env .
+COPY modeloutput_pb2.py .
 
 # Run the script
 ENTRYPOINT ["python3", "/app/cam2flowise.py"]

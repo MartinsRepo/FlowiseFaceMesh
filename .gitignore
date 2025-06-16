@@ -3,6 +3,7 @@
 src/__pycache__/
 src/.env
 *.py~
+dockerfile~
 __pycache__/
 README.md~
 

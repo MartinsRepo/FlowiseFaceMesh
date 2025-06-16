@@ -1,13 +1,20 @@
-import cv2
+import cv2, time
 import zmq
 import numpy as np
 from flask import Flask, Response, render_template_string, request, jsonify
 from flask_cors import CORS
 import threading
-import time
+import ecal.core.core as ecal_core
+from ecal.core.publisher import ProtoPublisher
+import modeloutput_pb2
+import textwrap
 
 app = Flask(__name__)
 CORS(app) # Enable CORS for all routes
+
+# initialise Ecal
+ecal_core.initialize([], "LLM Answer")
+pub = ProtoPublisher("from Flask",modeloutput_pb2.OUT)
 
 # ZeroMQ setup for video stream
 context = zmq.Context()
@@ -68,6 +75,13 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         time.sleep(0.03) # Adjust this for desired frame rate (e.g., ~30 fps)
+        
+def genECALdata(text):
+    pub2ecal = modeloutput_pb2.OUT()
+    pub2ecal.headline = "LLM Answer"
+    pub2ecal.text = text
+    pub.send(pub2ecal)
+    
 
 @app.route('/')
 def index():
@@ -170,6 +184,14 @@ def interpret_text():
 
     if llm_text:
         print(f"[{time.ctime()}] Received LLM text from Docker: {llm_text}")
+        
+        interpretation_text = data["text"]
+        wrapper = textwrap.TextWrapper(width=80, subsequent_indent='  ')
+        formatted = "\n".join(wrapper.fill(line) if not line.startswith("-") else wrapper.fill(line) for line in interpretation_text.splitlines())
+
+        # send Ecal data
+        genECALdata(formatted)
+        
         with llm_text_lock: # Protect shared variable access
             latest_llm_text = llm_text # Store the latest text
             llm_last_updated_time = time.time() * 1000 # Store timestamp in milliseconds for JS
@@ -198,3 +220,4 @@ if __name__ == '__main__':
     # Start the Flask web server
     print("Flask web server starting on http://0.0.0.0:5000") # Ensure this matches your FLASK_API_URL in cam2flowise.py
     app.run(host='0.0.0.0', port=5000, debug=True)
+    ecal_core.finalize()
