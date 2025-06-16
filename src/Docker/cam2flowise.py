@@ -1,23 +1,13 @@
-# Docker Version
-#
-# Features: 
-# Captures frames from the Webcam, generates a Facemesh and
-# sends the Json -yfied data to Flowise
-#
-# Proto file compilation:
-# protoc -I =. --python_out=. facedata.proto
-
-# Microsoft LiveCam - Adjust image
-# keyboard shortcuts that you can use to manage the zoom out/in feature of camera: 
-# Zoom Out = Ctrl + Minus Key, Zoom In = Ctrl + Plus key, Zoom to 100% = Ctrl + Zero key. 
-
 import sys, os, cv2, time, math, zmq, json, requests, multiprocessing
+from flask import Flask, request, jsonify
+from flask_cors import CORS # Important for cross-origin requests
 import numpy as np
 from mediapipe.tasks.python import vision
 from mediapipe.tasks import python
 import mediapipe as mp
 from dotenv import load_dotenv
 from multiprocessing import Queue, Process
+
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -27,6 +17,11 @@ load_dotenv()
 FLOW_ID = os.getenv('FLOWID')
 FLOWISE_API_URL = f"http://flowise:3000/api/v1/prediction/{FLOW_ID}"
 FLASK_API_URL = "http://192.168.0.228:5000/api/interpret"
+
+app = Flask(__name__)
+CORS(app) # Enable CORS for all routes
+
+#FLASK_API_URL = "http://192.168.0.228:5000/api/interpret"
 
 face_oval_indices = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361,
                      288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149,
@@ -139,18 +134,40 @@ def zmq_streamer(annotated_frame_queue):
 
 
 def llm_process(llm_queue, flask_queue):
-    while True:
-        payload = llm_queue.get()
-        try:
-            response = requests.post(FLOWISE_API_URL, json=payload)
-            if response.status_code == 200:
-                data = response.json()
-                print("LLM Output:", data.get("text"))
-                flask_queue.put({"text": data.get("text")})
-            else:
-                print("LLM Error:", response.status_code)
-        except Exception as e:
-            print("LLM call failed:", e)
+	while True:
+		payload = llm_queue.get()
+		try:
+			response = requests.post(FLOWISE_API_URL, json=payload)
+			if response.status_code == 200:
+				data = response.json()
+
+				print("LLM Output:", data.get("text"))
+
+				flask_queue.put({"text": data.get("text")})
+			else:
+				print("LLM Error:", response.status_code)
+		except Exception as e:
+			print("LLM call failed:", e)
+
+
+@app.route('/api/interpret', methods=['POST'])
+def interpret():
+    if not request.is_json:
+        return jsonify({"status": "error", "message": "Request must be JSON"}), 400
+
+    data = request.get_json()
+    text_output = data.get('text')
+
+    if text_output:
+        print(f"Received LLM text from Docker: {text_output}")
+        # You can now process this text, display it in a GUI, save to a file, etc.
+        # Example: Append to a log file
+        with open("llm_interpretations.log", "a") as f:
+            f.write(f"[{time.ctime()}] LLM Interpretation: {text_output}\n")
+
+        return jsonify({"status": "success", "message": "Text received and processed on host"}), 200
+    else:
+        return jsonify({"status": "error", "message": "No 'text' field in request body"}), 400
 
 
 def flask_process(flask_queue):
@@ -169,7 +186,7 @@ def main():
     annotated_frame_queue = Queue()
     llm_queue = Queue()
     flask_queue = Queue()
-
+    
     processes = [
         Process(target=cam_capture, args=(raw_frame_queue,), daemon=True),
         Process(target=landmark_process, args=(raw_frame_queue, annotated_frame_queue, llm_queue), daemon=True),
@@ -177,7 +194,7 @@ def main():
         Process(target=llm_process, args=(llm_queue, flask_queue), daemon=True),
         Process(target=flask_process, args=(flask_queue,), daemon=True)
     ]
-
+    
     for p in processes:
         p.start()
     for p in processes:
@@ -185,7 +202,7 @@ def main():
 
 if __name__ == '__main__':
     main()
-
+    app.run(host='0.0.0.0', port=5001)
 
 
 
