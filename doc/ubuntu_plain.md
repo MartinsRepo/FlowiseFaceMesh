@@ -1,0 +1,19 @@
+## Workflow
+
+![Workflow](./galleries/workflow.jpg)
+
+###  Installation
+
+#### Step1
+Then we start a container mapped to an external volume to store the projects permanently:
+
+    docker run 	-d --name flowise \
+			    -v <your local folder>/root/.flowise \
+			    -p 8000:3000 flowise
+After one or two minutes, you can access flowise in
+
+    http://localhost:8000/
+
+
+
+> Written with [StackEdit](https://stackedit.io/).

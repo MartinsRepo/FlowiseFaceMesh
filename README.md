@@ -4,26 +4,57 @@
 ## License 
 **Google Mediapipe**, **flowiseai/flowise** in Dockerhub and **Ecal** are licensed under [Apache Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). This repo follows the licence terms.
 
-## Installation
-The Goal of this project is to connect external programs with a Large Language Model, designed and running in Flowise.
+## Project Description
+The Goal of this project is to connect external programs with a Large Language Model, designed and running in Flowise. The usecase is a life cam stream of a face decorated with **Google Mediapipe** generated landmarks as an input to a **Flowise**-model running in docker container. The model, locally an **Ollama** model or **Openai** interfaced via API, should interpret the data and post the result outside of the container.  The following link points to the Flowise homepage. 
 > [Flowise - # Build AI Agents Visually ](https://flowiseai.com/)
 
-![Workflow](./galleries/workflow.jpg)
+## Installation
+### Prerequisites
 
-### Step 1:
+#### Step 1:
+Docker installation
+
+> [Installation Ubuntu](https://www.datacamp.com/tutorial/install-docker-on-ubuntu)
+> [Installation Windows 11 / WSL2](https://docs.docker.com/desktop/features/wsl/)
+
+#### Step 2:
 Flowise is for free and we will install a Docker image from the Docker Hub
 > [FlowiseAI from the Dockerhub](https://hub.docker.com/r/flowiseai/flowise)
 
     docker pull flowiseai/flowise
 
-Then we start a container mapped to an external volume to store the projects permanently:
+#### Step3:
+a) Local Models - Install **Ollama**
 
-    docker run 	-d --name flowise \
-			    -v <your local folder>/root/.flowise \
-			    -p 8000:3000 flowise
-After one or two minutes, you can access flowise in
+> [Link to OLLAMA](https://ollama.com/)
 
-    http://localhost:8000/
+Download the preferred model, eg
+
+    ollama pull deepseek-r1:14b
+b) Cloud-based
+Create an API key, eg. OpenAI:
+
+    https://platform.openai.com/api-keys
+
+#### Step 4:
+Install the requirements.txt in a virtual python environment, eg pyenv or conda. 
+
+ - [**pyenv usage**](https://realpython.com/intro-to-pyenv/) 
+ - [**conda usage**](https://www.geeksforgeeks.org/set-up-virtual-environment-for-python-using-anaconda/)
+
+### Ubuntu
+#### [Plain Installation](./doc/ubuntu_plain.md)
+
+#### Plain Installation
+
+#### Docker Implementation
+
+### Windows
+
+
+
+
+
 
 ### Step2:
 Open the sidetab Chatflows or Agentflows and add a new one:
@@ -45,10 +76,8 @@ Open the sidetab Chatflows or Agentflows and add a new one:
 `deepseek-r1:14b`
 
 ### Step 3:
-Install the requirements.txt in a virtual python environment, eg pyenv or conda. 
 
- - [**pyenv usage**](https://realpython.com/intro-to-pyenv/) 
- - [**conda usage**](https://www.geeksforgeeks.org/set-up-virtual-environment-for-python-using-anaconda/)
+
 
 Here, i used the env name: **ecal**
 
@@ -75,6 +104,81 @@ It is based on Protobuf messages, in our case like this:
 
 Model Input
 
+    syntax = "proto3";
+    package pb.facedata;
+    message FaceData{
+	    string filename = 1;
+	    repeated Landmarks packedlM = 2; //array of landmark data, packaged to reduce sampling rate
+	    repeated FaceOval packedFO = 3; // Additional face oval landmarks
+	 }
+	message Landmarks{
+	    string name = 1;
+	    int32 x = 2;
+	    int32 y = 3;
+	}
+	message FaceOval{
+	    string name = 1;
+	    int32 x = 2;
+	    int32 y = 3;
+	}
+
+Model output
+
+	syntax = "proto3";
+	package pb.flask;
+	message OUT{
+    string headline = 1;
+    string text = 2;
+    }
+
+
+
+
+So, the camera und the LLM model must not be on the same PC, PC - Raspberry also works.
+If need - compile the Proto-file:
+
+    protoc -I =. --python_out=. facedata.proto
+    protoc -I =. --python_out=. modeloutput.proto
+
+### B) What is a Facemesh?
+
+For **Facedetection** we are using **Google Mediapipe**. [Link here](https://developers.google.com/mediapipe/solutions). From this we are using the solutions [Face Landmarker](https://developers.google.com/mediapipe/solutions/vision/face_landmarker) and [Hand Landmarker](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker). The canonical Face Landmark Model is shown here: [Canonical Face Model](https://github.com/google/mediapipe/issues/1854). The model, used here, can be found on [mediapipe solutions](https://github.com/google/mediapipe/blob/master/docs/solutions/models.md).
+
+### C) Running the Modules
+### Step 1:
+Import the Flowise model from your **src/FlowiseModel** path in the Flowise broswer tab:
+
+- Create a new Agent Flow or Chat Flow by pressing **Add New** and
+- **Load Chatflow** from the settings tab, eg: **GithubFlowiseOpenAI Chatflow.json**
+![import](./galleries/import.png)
+- Save the model after adding your creditentials
+### Step 2:
+ - Adapt your .env files with the correct Flowise ID (to be found on the project browser tab and looks something like: adb94663-c66b-49f7-87f1-7788aff22a7a
+ - Open 3 terminal windows, activate the virtual environment and go the src folder
+ - Run in the first terminal window : 
+
+	`python facemesh2ecal.py`
+    
+ - Run in the second terminal window: 
+
+	`python ecal2flowise.py`
+    
+ - Run in the third terminal window : 
+
+	`python flaskendpoint.py`
+
+The result will something like this:
+![screenshot](./galleries/running.png)
+
+and the Ecal Messages are:
+![Ecal](galleries/./ecal_setup.png)
+
+### Annotation
+Using the  **Microsoft Lifecam HD3000**, you can adjust the video frame.
+Keyboard shortcuts that you can use to manage the zoom out/in feature of camera:
+> **Zoom Out = Ctrl + Minus Key, Zoom In = Ctrl + Plus key, Zoom to 100% = Ctrl + Zero key**
+
+> Written with [StackEdit](https://stackedit.io/).
     syntax = "proto3";
     package pb.facedata;
     message FaceData{
