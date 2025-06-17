@@ -128,13 +128,15 @@ Import the Flowise model from your **src/FlowiseModel** path in the Flowise bros
  - Open 3 terminal windows, activate the virtual environment and go the src folder
  - Run in the first terminal window : 
 
-    python facemesh2ecal.py
+	`python facemesh2ecal.py`
+    
  - Run in the second terminal window: 
 
-    python ecal2flowise.py
+	`python ecal2flowise.py`
+    
  - Run in the third terminal window : 
 
-    python flaskendpoint.py
+	`python flaskendpoint.py`
 
 The result will something like this:
 ![screenshot](./galleries/running.png)
