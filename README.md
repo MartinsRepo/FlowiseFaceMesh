@@ -44,10 +44,8 @@ Install the requirements.txt in a virtual python environment, eg pyenv or conda.
 
 ### Ubuntu
 #### [Plain Installation](./doc/ubuntu_plain.md)
+#### [Docker Installation](./doc/ubuntu_docker.md)
 
-#### Plain Installation
-
-#### Docker Implementation
 
 ### Windows
 
@@ -56,24 +54,6 @@ Install the requirements.txt in a virtual python environment, eg pyenv or conda.
 
 
 
-### Step2:
-Open the sidetab Chatflows or Agentflows and add a new one:
-
- - Import one model as JSON from src/FlowiseModel. 
- - Two models are available: 
- - *GithubFlowiseOpenAI Chatflow.json* or *Visual Chatflow Deepseek_Ollama.json*
- - In the OpenAI version, add your OpenAI API Key in the chatModel.
- - In the local Ollama version, make sure, that:
-> your Ollama Server is started with:
-
-    OLLAMA_HOST=0.0.0.0:11434 ollama serve
-> and your ChatOllama in your imported Flowise model is set to: 
-
-    http://"your local PC IPaddress":11434
-
-> Select the model with the name, eg. 
-
-`deepseek-r1:14b`
 
 ### Step 3:
 
@@ -104,81 +84,6 @@ It is based on Protobuf messages, in our case like this:
 
 Model Input
 
-    syntax = "proto3";
-    package pb.facedata;
-    message FaceData{
-	    string filename = 1;
-	    repeated Landmarks packedlM = 2; //array of landmark data, packaged to reduce sampling rate
-	    repeated FaceOval packedFO = 3; // Additional face oval landmarks
-	 }
-	message Landmarks{
-	    string name = 1;
-	    int32 x = 2;
-	    int32 y = 3;
-	}
-	message FaceOval{
-	    string name = 1;
-	    int32 x = 2;
-	    int32 y = 3;
-	}
-
-Model output
-
-	syntax = "proto3";
-	package pb.flask;
-	message OUT{
-    string headline = 1;
-    string text = 2;
-    }
-
-
-
-
-So, the camera und the LLM model must not be on the same PC, PC - Raspberry also works.
-If need - compile the Proto-file:
-
-    protoc -I =. --python_out=. facedata.proto
-    protoc -I =. --python_out=. modeloutput.proto
-
-### B) What is a Facemesh?
-
-For **Facedetection** we are using **Google Mediapipe**. [Link here](https://developers.google.com/mediapipe/solutions). From this we are using the solutions [Face Landmarker](https://developers.google.com/mediapipe/solutions/vision/face_landmarker) and [Hand Landmarker](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker). The canonical Face Landmark Model is shown here: [Canonical Face Model](https://github.com/google/mediapipe/issues/1854). The model, used here, can be found on [mediapipe solutions](https://github.com/google/mediapipe/blob/master/docs/solutions/models.md).
-
-### C) Running the Modules
-### Step 1:
-Import the Flowise model from your **src/FlowiseModel** path in the Flowise broswer tab:
-
-- Create a new Agent Flow or Chat Flow by pressing **Add New** and
-- **Load Chatflow** from the settings tab, eg: **GithubFlowiseOpenAI Chatflow.json**
-![import](./galleries/import.png)
-- Save the model after adding your creditentials
-### Step 2:
- - Adapt your .env files with the correct Flowise ID (to be found on the project browser tab and looks something like: adb94663-c66b-49f7-87f1-7788aff22a7a
- - Open 3 terminal windows, activate the virtual environment and go the src folder
- - Run in the first terminal window : 
-
-	`python facemesh2ecal.py`
-    
- - Run in the second terminal window: 
-
-	`python ecal2flowise.py`
-    
- - Run in the third terminal window : 
-
-	`python flaskendpoint.py`
-
-The result will something like this:
-![screenshot](./galleries/running.png)
-
-and the Ecal Messages are:
-![Ecal](galleries/./ecal_setup.png)
-
-### Annotation
-Using the  **Microsoft Lifecam HD3000**, you can adjust the video frame.
-Keyboard shortcuts that you can use to manage the zoom out/in feature of camera:
-> **Zoom Out = Ctrl + Minus Key, Zoom In = Ctrl + Plus key, Zoom to 100% = Ctrl + Zero key**
-
-> Written with [StackEdit](https://stackedit.io/).
     syntax = "proto3";
     package pb.facedata;
     message FaceData{
