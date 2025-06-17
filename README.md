@@ -1,4 +1,4 @@
-![intro](intro.png)
+![intro](./galleries/intro.png)
 # FlowiseMesh - Textual Facedetection with LLM
 
 ## License 
@@ -8,7 +8,7 @@
 The Goal of this project is to connect external programs with a Large Language Model, designed and running in Flowise.
 > [Flowise - # Build AI Agents Visually ](https://flowiseai.com/)
 
-![Workflow](workflow.jpg)
+![Workflow](./galleries/workflow.jpg)
 
 ### Step 1:
 Flowise is for free and we will install a Docker image from the Docker Hub
@@ -121,7 +121,7 @@ Import the Flowise model from your **src/FlowiseModel** path in the Flowise bros
 
 - Create a new Agent Flow or Chat Flow by pressing **Add New** and
 - **Load Chatflow** from the settings tab, eg: **GithubFlowiseOpenAI Chatflow.json**
-![import](import.png)
+![import](./galleries/import.png)
 - Save the model after adding your creditentials
 ### Step 2:
  - Adapt your .env files with the correct Flowise ID (to be found on the project browser tab and looks something like: adb94663-c66b-49f7-87f1-7788aff22a7a
@@ -137,10 +137,10 @@ Import the Flowise model from your **src/FlowiseModel** path in the Flowise bros
     python flaskendpoint.py
 
 The result will something like this:
-![screenshot](running.png)
+![screenshot](./galleries/running.png)
 
 and the Ecal Messages are:
-![Ecal](ecal_setup.png)
+![Ecal](galleries/./ecal_setup.png)
 
 ### Annotation
 Using the  **Microsoft Lifecam HD3000**, you can adjust the video frame.
