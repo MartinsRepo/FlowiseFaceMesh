@@ -70,6 +70,29 @@ For Windows:
     pip install ecal5-5.13.3-cp311-cp311-win_amd64.whl
 
 
+### Step 7: Configuring .env
+.env looks something like this:
+
+    ###### FLOWISE ID NUMBER 
+    # Ollama Model 
+    # FLOWID = <Your Flowise ID>
+    # OpenAI Model
+    FLOWID = <Your Flowise ID>
+    ###### Module Selection - VALID only for NON-Docker Application
+    # USECAM = False -> Sample image is used
+    # USECAM = True -> Webcam is used
+    # USECAM = False
+    USECAM = True
+    ###### Picture Selection
+    FOLDER = Images/
+    # IMAGE = base.png
+    # IMAGE = looking_right.jpg
+    # IMAGE = looking_left.jpg
+    IMAGE = smiling.jpg
+
+Your Flowise ID can be found here:
+![flowid](./galleries/flowid.png)
+
 ## Elements of the Software
 
 ### A) Communication Layer ECAL
