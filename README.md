@@ -77,8 +77,7 @@ eCAL (**e**nhanced **C**ommunication **A**bstraction **L**ayer) is a fast publis
 It comes with some tools, like the  **ECAL-Monitor** and the **ECAL-Player**.
 
 It is based on Protobuf messages.
-The documentation can be found here: [[Protocol Buffers Documentation](https://protobuf.dev/)](https://protobuf.dev/overview/)
-
+The documentation can be found here: [Protocol Buffers Documentation](https://protobuf.dev/)
 The proto files in this project are:
  - facedata.proto
  - modeloutput.proto
@@ -89,13 +88,6 @@ They can be compiled by the command:
 
 `protoc -I =. --python_out=. modeloutput.proto`
  
-
-So, the camera und the LLM model must not be on the same PC, PC - Raspberry also works.
-If need - compile the Proto-file:
-
-`protoc -I =. --python_out=. facedata.proto`
-    
-`protoc -I =. --python_out=. modeloutput.proto`
 
 ### B) Using Facemesh from Google Mediapie
 
@@ -118,4 +110,5 @@ Keyboard shortcuts that you can use to manage the zoom out/in feature of camera:
 > **Zoom Out = Ctrl + Minus Key, Zoom In = Ctrl + Plus key, Zoom to 100% = Ctrl + Zero key**
 
 > Written with [StackEdit](https://stackedit.io/).
+
 
