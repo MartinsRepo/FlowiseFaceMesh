@@ -69,7 +69,7 @@ In the same folder start:
     python webcam_stream_server.py
 
 ### Result:
-[Flaskserver](../galleries/docker_linux.png)
+![Flaskserver](../galleries/docker_linux.png)
 
 
 > Written with [StackEdit](https://stackedit.io/).
